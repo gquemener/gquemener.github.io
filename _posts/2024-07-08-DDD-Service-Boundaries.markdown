@@ -5,6 +5,8 @@ date:   2024-07-09 09:55:09 +0200
 categories: ddd
 ---
 
+_Reading time: 5 minutes_
+
 ## Introduction
 
 Last month, Tech Excellence (add short description) invited Adam Ralph to talk about Domain Driven Design and Service Boundaries.

@@ -5,6 +5,8 @@ date:   2024-02-03 10:54:09 +0100
 categories: rust
 ---
 
+_Reading time: 5 minutes_
+
 A few years ago, I've started getting interested in Rust.
 
 > Rust is blazingly fast and memory-efficient: with no runtime or garbage collector, it can power performance-critical services, run on embedded devices, and easily integrate with other languages. [Source](https://www.rust-lang.org/)
