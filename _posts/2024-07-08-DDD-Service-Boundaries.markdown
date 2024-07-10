@@ -9,7 +9,7 @@ _Reading time: 5 minutes_
 
 ## Introduction
 
-Last month, Tech Excellence (add short description) invited Adam Ralph to talk about Domain Driven Design and Service Boundaries.
+Last month, [Tech Excellence](https://www.techexcellence.io/) ("A community of software developers and engineering leaders who are raising the bar of technical excellence across the world.") invited Adam Ralph to talk about Domain Driven Design and Service Boundaries.
 
 You can find a link to a recording [here](https://www.youtube.com/watch?v=I5fhtBQ2wQU).
 
