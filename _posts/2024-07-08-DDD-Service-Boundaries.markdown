@@ -5,6 +5,8 @@ date:   2024-07-09 09:55:09 +0200
 categories: ddd
 ---
 
+![DDD - Service Boundaries (Adam Ralph)](../images/ddd_service_boundaries.png)
+
 _Reading time: 5 minutes_
 
 ## Introduction
