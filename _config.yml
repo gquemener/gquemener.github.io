@@ -34,6 +34,9 @@ plugins:
 
 minima:
   skin: auto
+  social_links:
+    - { platform: github, user_url: "https://github.com/gquemener" }
+    - { platform: twitter, user_url: "https://github.com/GildasQ" }
 
 # Exclude from processing.
 # The following items will not be processed, by default.
