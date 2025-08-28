@@ -7,7 +7,7 @@ categories: database
 
 _Reading time: 6-7 minutes_
 
-_Cet article est une traduction d’[un article](https://www.kalzumeus.com/2010/06/17/falsehoods-programmers-believe-about-names/) écrit par Patrick McKenzie, le 17/06/2010. Je l’ai trouvé inspirant, et il reflète un certain nombres de situations que j’ai moi-même vécues à titre personnel ou que j’ai pues observer dans ma vie professionnelle. C’est ce qui m’a motivé à le traduire, afin d’en faire profiter un maximum de francophone!_
+_Cet article est une traduction d’[un article](https://www.kalzumeus.com/2010/06/17/falsehoods-programmers-believe-about-names/) écrit par Patrick McKenzie, le 17/06/2010. Je l’ai trouvé inspirant, et il reflète un certain nombre de situations que j’ai moi-même vécues à titre personnel ou que j’ai pu observer dans ma vie professionnelle. C’est ce qui m’a motivé à le traduire, afin d’en faire profiter un maximum de francophone !_
 
 John Graham-Cumming a écrit [un article](http://blog.jgc.org/2010/06/your-last-name-contains-invalid.html) en se plaignant d’un formulaire sur un site internet qui refusait son nom de famille, au prétexte qu’il contenait des caractères invalides. Ce n’était évidemment pas le cas, car peu importe ce qu’une personne affirme être son nom, cela est - par définition - une façon appropriée de l’identifier. John était, à raison, vexé par cette situation car le nom est **une information centrale pour notre identité**.
 
@@ -38,7 +38,7 @@ Ainsi, afin de nous rendre service à tous, je vais lister des idées reçues qu
 21. Le nom des gens est mondialement unique.
 22. Le nom des gens est _presque_ mondialement unique.
 23. D’accord, d’accord, mais les noms des gens sont assez diversifiés pour qu’il n’y ait pas des millions de personnes qui partagent le même nom.
-24. Mon système n’aura jamais à traîter des noms en provenance de Chine.
+24. Mon système n’aura jamais à traiter des noms en provenance de Chine.
 25. ou du Japon.
 26. ou de Corée.
 27. ou d’Irlande, du Royaume Uni, des États-Unis, d’Espagne, du Mexique, du Brésil, du Pérou, de Russie, de Suède, du Botswana, d’Afrique du Sud, de Trinidad, d’Haïti, de France, ou de l’empire Klingon, qui ont tous des noms “bizarres” de façon habituelle.
@@ -52,8 +52,8 @@ Ainsi, afin de nous rendre service à tous, je vais lister des idées reçues qu
 35. Cinq ans ?
 36. Vous vous moquez de moi, hein ?
 37. Deux systèmes contenant des données sur une personne utiliseront le même nom pour cette personne.
-38. Deux opérateurs en charge de renseigner le nom d’une personne dans un système, entreront exactement la même séquence de bits sous forme de chaîne de caractères sur n’importe quel système, si celui-ci est bien designé.
+38. Deux opérateurs en charge de renseigner le nom d’une personne dans un système, entreront exactement la même séquence de bits sous forme de chaîne de caractères sur n’importe quel système, si celui-ci est bien fait.
 39. Les gens dont le nom casse mon système sont des cas à la marge. Ils devraient avoir un nom solide et acceptable, comme 田中太郎.
 40. Les gens ont un nom.
 
-Cette liste n’est absolument pas exhaustive. Si vous avez besoin d’exemples qui réfutent n’importe laquelle de ces idées reçues, je vous en fournirais avec plaisir. N’hésitez pas à ajouter d’autres idées reçues en commentaires, et à partagez cet article la prochaine fois qu’un collègue suggére l’idée de génie d’ajouter des colonnes first_name et last_name.
+Cette liste n’est absolument pas exhaustive. Si vous avez besoin d’exemples qui réfutent n’importe laquelle de ces idées reçues, je vous en fournirais avec plaisir. N’hésitez pas à ajouter d’autres idées reçues en commentaires, et à partagez cet article la prochaine fois qu’un collègue suggère l’idée de génie d’ajouter des colonnes first_name et last_name.
