@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Sailing Wind Simulator</title>
+<style>
+:root{--bg:#f5f7fa;--card:#fff;--tx:#14202b;--mut:#5c6b78;--bd:#d9e0e7;--tw:#1769c9;--aw:#e0701a;--bt:#7b8794;--ok:#17855a;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e151c;--card:#17212b;--tx:#e8eef3;--mut:#93a3b1;--bd:#2a3845;--tw:#5aa7ff;--aw:#ff9b4a;--bt:#8d9aa6;--ok:#4cd39b;color-scheme:dark}}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:640px;margin:0 auto;padding:14px}
+.top{display:flex;justify-content:space-between;align-items:center;margin:4px 0 12px}
+h1{font-size:20px;margin:0}h2{font-size:13px;margin:0 0 8px;color:var(--mut);text-transform:uppercase;letter-spacing:.05em}
+#lang{display:flex;border:1px solid var(--bd);border-radius:999px;overflow:hidden;background:var(--card)}
+#lang button{border:0;background:none;color:var(--mut);font:600 13px system-ui;padding:6px 12px;cursor:pointer}
+#lang button.on{background:var(--tw);color:#fff}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:12px;margin-bottom:12px}
+label{display:flex;justify-content:space-between;gap:8px;font-weight:600;margin-top:8px}label b{font-variant-numeric:tabular-nums;white-space:nowrap}
+input[type=range]{width:100%;margin:4px 0}
+.row{display:flex;align-items:center;gap:8px;margin-top:10px;color:var(--mut)}
+canvas{width:100%;display:block}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.m{border:1px solid var(--bd);border-radius:10px;padding:8px 10px}.m small{color:var(--mut);display:block}.m span{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.tw{color:var(--tw)}.aw{color:var(--aw)}.ok{color:var(--ok)}
+ul{margin:6px 0 0;padding-left:18px}li{margin:4px 0}.leg{font-size:13px;color:var(--mut);margin-top:6px}
+</style></head><body><main>
+<div class="top"><h1 data-i="h1"></h1><div id="lang"><button data-l="en" class="on">EN</button><button data-l="fr">FR</button></div></div>
+<div class="card">
+<label><span data-i="ltws"></span> <b class="tw"><span id="vtws"></span> <span class="u"></span></b></label><input id="tws" type="range" min="2" max="40" step="0.5" value="12">
+<label><span data-i="ltwa"></span> <b class="tw"><span id="vtwa"></span>°</b></label><input id="twa" type="range" min="0" max="180" step="1" value="45">
+<div class="row"><input id="auto" type="checkbox" checked><span data-i="auto"></span></div>
+<label><span data-i="lbs"></span> <b><span id="vbs"></span> <span class="u"></span></b></label><input id="bs" type="range" min="0" max="20" step="0.1" value="6">
+</div>
+<div class="card"><h2 data-i="h2tri"></h2><canvas id="tri" height="270"></canvas><div class="leg" data-i="leg1"></div></div>
+<div class="card"><div class="grid">
+<div class="m"><small data-i="laws"></small><span class="aw"><span id="aws"></span> <span class="u"></span></span></div>
+<div class="m"><small data-i="lawa"></small><span class="aw"><span id="awa"></span>°</span></div>
+<div class="m"><small id="vl"></small><span class="ok"><span id="vmg"></span> <span class="u"></span></span></div>
+<div class="m"><small data-i="lpos"></small><span style="font-size:17px" id="pos"></span></div>
+</div><div class="leg" id="note"></div></div>
+<div class="card"><h2 data-i="h2pol"></h2><canvas id="pol" height="270"></canvas><div class="leg" data-i="leg2"></div></div>
+<div class="card"><h2 data-i="hgood"></h2><ul id="info"></ul></div>
+<div class="card"><h2 data-i="hhow"></h2><ul data-i="how"></ul></div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const T={en:{
+h1:'⛵ Wind Simulator',ltws:'True wind speed (TWS)',ltwa:'True wind angle (TWA)',auto:'Boat speed from typical cruiser polar',lbs:'Boat speed (BSP)',
+h2tri:'Wind triangle',leg1:'<span class="tw">━ True wind</span> · <span style="color:var(--bt)">╌ Boat speed</span> · <span class="aw">━ Apparent wind</span> (what the masthead sees)',
+laws:'Apparent wind speed (AWS)',lawa:'Apparent wind angle (AWA)',lpos:'Point of sail',h2pol:'Polar &amp; VMG',
+leg2:'Curve = boat speed at each TWA (wind from the top). Dot = you. Dashed line = VMG (your progress along the wind axis). Green dots = best VMG angles.',
+hgood:'Good to know',hhow:'How it works',
+how:'<li>Apparent wind = true wind vector minus boat velocity vector. AWA = atan2(TWS·sin TWA, TWS·cos TWA + BSP).</li><li>VMG = BSP × cos(TWA): speed made good toward (upwind) or away from (downwind) the wind.</li><li>The fastest angle isn’t the best VMG angle: sail slightly lower upwind, and gybe downwind, to maximize it.</li><li>As you speed up, the apparent wind moves forward and strengthens, so downwind it feels light and upwind it feels strong.</li>',
+u:'kn',vu:'VMG upwind',vd:'VMG downwind',vb:'VMG (beam reach: none)',
+pos:['In irons (no-go)','Close-hauled','Close reach','Beam reach','Broad reach','Deep reach / run','Dead run'],
+bf:['Calm','Light air','Light breeze','Gentle breeze','Moderate breeze','Fresh breeze','Strong breeze','Near gale','Gale','Strong gale','Storm'],
+ctw:'TWS ',caw:'AWS ',cm:'arrows show where the wind blows to',cw:'wind ↓',
+note:(d,s,x)=>`Apparent wind is <b>${d}°</b> forward of the true wind and ${s?'<b>stronger</b>':'<b>lighter</b>'} by ${x} kn.`,
+adv:['Light: go full sail, consider a code zero or gennaker.','Full main and genoa should work well.','Consider the first reef if gusts are expected.','Reef the main and furl some headsail.','Heavy: deep reefs, storm jib; think about shortening the passage.'],
+cu:p=>`Your VMG is ${p}% of the best upwind VMG.`,cd:p=>`Your VMG is ${p}% of the best downwind VMG.`,
+i1:(n,nm,a)=>`<li><b>Beaufort ${n}</b>: ${nm} (true wind). Real conditions follow the <i>apparent</i> wind: ${a}</li>`,
+i2:(ua,uv,da,dv,c)=>`<li><b>Best upwind VMG</b>: TWA ≈ ${ua}° (${uv} kn). <b>Best downwind VMG</b>: TWA ≈ ${da}° (${dv} kn). ${c}</li>`,
+i3:'<li><b>Gusts &amp; lulls</b>: a gust raises AWS and swings AWA aft briefly; ease the sheets, bear away or depower. In a lull the apparent wind swings forward.</li><li><b>Wind shifts</b>: a lift lets you point higher on the same tack; a header pushes you down. Tack on headers to stay near the favored side.</li><li><b>Height</b>: wind is stronger higher up, typically 10–20% more at the masthead than at deck level, which matters for heel and reefing.</li><li><b>Rule of thumb</b>: sail force grows with AWS², so doubling the apparent wind quadruples the force and heeling.</li>'
+},fr:{
+h1:'⛵ Simulateur de vent',ltws:'Vitesse du vent réel (VVR)',ltwa:'Angle du vent réel (AVR)',auto:'Vitesse du bateau d’après une polaire de croiseur type',lbs:'Vitesse du bateau (VB)',
+h2tri:'Triangle des vitesses du vent',leg1:'<span class="tw">━ Vent réel</span> · <span style="color:var(--bt)">╌ Vitesse du bateau</span> · <span class="aw">━ Vent apparent</span> (celui que ressent le bateau)',
+laws:'Vitesse du vent apparent (VVA)',lawa:'Angle du vent apparent (AVA)',lpos:'Allure',h2pol:'Polaire &amp; VMG',
+leg2:'Courbe = vitesse du bateau pour chaque AVR (vent venant du haut). Point orange = vous. Tirets = VMG (votre progression sur l’axe du vent). Points verts = meilleurs angles de VMG.',
+hgood:'Bon à savoir',hhow:'Fonctionnement',
+how:'<li>Vent apparent = vecteur du vent réel moins vecteur vitesse du bateau. AVA = atan2(VVR·sin AVR, VVR·cos AVR + VB).</li><li>VMG = VB × cos(AVR) : vitesse utile vers le vent (au près) ou à l’opposé (au portant).</li><li>L’angle le plus rapide n’est pas celui du meilleur VMG : on navigue un peu plus bas au près, et on empanne au portant, pour la maximiser.</li><li>Quand le bateau accélère, le vent apparent refuse et forcit : au portant il paraît faible, au près il paraît fort.</li>',
+u:'nds',vu:'VMG au près',vd:'VMG au portant',vb:'VMG (travers : aucun)',
+pos:['Face au vent (zone interdite)','Près','Petit largue','Travers','Grand largue','Vent arrière (largue profond)','Vent arrière'],
+bf:['Calme','Très légère brise','Légère brise','Petite brise','Jolie brise','Bonne brise','Vent frais','Grand frais','Coup de vent','Fort coup de vent','Tempête'],
+ctw:'VVR ',caw:'VVA ',cm:'les flèches montrent vers où souffle le vent',cw:'vent ↓',
+note:(d,s,x)=>`Le vent apparent est <b>${d}°</b> plus proche de l’axe que le vent réel et ${s?'<b>plus fort</b>':'<b>plus faible</b>'} de ${x} nds.`,
+adv:['Faible : toute la toile, pensez au code zéro ou au gennaker.','Grand-voile et génois pleins devraient convenir.','Envisagez le premier ris si des rafales sont prévues.','Prenez un ris dans la grand-voile et roulez une partie du génois.','Fort : ris profonds, tourmentin ; pensez à écourter la navigation.'],
+cu:p=>`Votre VMG vaut ${p} % du meilleur VMG au près.`,cd:p=>`Votre VMG vaut ${p} % du meilleur VMG au portant.`,
+i1:(n,nm,a)=>`<li><b>Beaufort ${n}</b> : ${nm} (vent réel). Les conditions réelles dépendent du vent <i>apparent</i> : ${a}</li>`,
+i2:(ua,uv,da,dv,c)=>`<li><b>Meilleur VMG au près</b> : AVR ≈ ${ua}° (${uv} nds). <b>Meilleur VMG au portant</b> : AVR ≈ ${da}° (${dv} nds). ${c}</li>`,
+i3:'<li><b>Rafales et molles</b> : une rafale augmente la VVA et fait brièvement adonner l’AVA ; choquez, abattez ou dépuissancez. Dans une molle, le vent apparent refuse.</li><li><b>Variations de vent</b> : une surventée permet de remonter plus haut sur la même amure ; une refusante vous fait abattre. Virez sur les refusantes pour rester du bon côté.</li><li><b>Hauteur</b> : le vent est plus fort en altitude, typiquement 10 à 20 % de plus en tête de mât qu’au pont, ce qui compte pour la gîte et les ris.</li><li><b>Règle pratique</b> : la force dans les voiles croît comme VVA², donc un vent apparent doublé quadruple la force et la gîte.</li>'
+}};
+let L='en';const t=k=>T[L][k];
+const fm=(n,d=1)=>{const s=n.toFixed(d);return L==='fr'?s.replace('.',','):s};
+const A=[0,30,40,52,60,75,90,110,135,150,180],K=[0,0,.4,.52,.58,.62,.64,.66,.6,.52,.45];
+const rad=d=>d*Math.PI/180,deg=r=>r*180/Math.PI;
+function polar(a,w){let i=0;while(i<A.length-2&&a>A[i+1])i++;const q=(a-A[i])/(A[i+1]-A[i]);return (K[i]+(K[i+1]-K[i])*q)*w/(1+w/45)}
+function best(w){let u={v:0,a:45},d={v:0,a:150};for(let a=30;a<=180;a++){const v=polar(a,w)*Math.cos(rad(a));if(v>u.v)u={v,a};if(-v>d.v)d={v:-v,a}}return{u,d}}
+const th=[1,4,7,11,17,22,28,34,41,48,56];
+function pos(a){return t('pos')[a<30?0:a<60?1:a<80?2:a<100?3:a<135?4:a<170?5:6]}
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+function setup(c){const d=devicePixelRatio||1,w=c.clientWidth,h=+(c.dataset.h||(c.dataset.h=c.getAttribute('height')));c.style.height=h+'px';c.width=w*d;c.height=h*d;const x=c.getContext('2d');x.scale(d,d);x.clearRect(0,0,w,h);return[x,w,h]}
+function arrow(x,a,b,c,d,col,lw,dash){x.strokeStyle=x.fillStyle=col;x.lineWidth=lw;x.setLineDash(dash||[]);x.beginPath();x.moveTo(a,b);x.lineTo(c,d);x.stroke();x.setLineDash([]);const an=Math.atan2(d-b,c-a),s=9+lw;x.beginPath();x.moveTo(c,d);x.lineTo(c-s*Math.cos(an-.4),d-s*Math.sin(an-.4));x.lineTo(c-s*Math.cos(an+.4),d-s*Math.sin(an+.4));x.fill()}
+function boat(x,px,py){x.fillStyle=css('--tx');x.beginPath();x.moveTo(px,py-18);x.quadraticCurveTo(px+9,py-2,px+6,py+14);x.lineTo(px-6,py+14);x.quadraticCurveTo(px-9,py-2,px,py-18);x.fill()}
+function draw(S){
+ let[x,w,h]=setup($('tri'));
+ const a=rad(S.twa),p1=[0,S.bs],p2=[S.tws*Math.sin(a),S.tws*Math.cos(a)+S.bs];
+ const xs=[0,0,p2[0]],ys=[0,p1[1],p2[1],-2],mnx=Math.min(...xs,-1),mxx=Math.max(...xs,1),mny=Math.min(...ys),mxy=Math.max(...ys,2);
+ const sc=Math.min((w-110)/Math.max(mxx-mnx,8),(h-70)/Math.max(mxy-mny,8),28);
+ const ox=w/2-(mnx+mxx)/2*sc,oy=h/2+(mny+mxy)/2*sc,P=p=>[ox+p[0]*sc,oy-p[1]*sc];
+ const O=P([0,0]),B=P(p1),E=P(p2);
+ x.strokeStyle=css('--bd');x.setLineDash([3,4]);x.beginPath();x.moveTo(O[0],O[1]+40);x.lineTo(O[0],O[1]-Math.max(60,mxy*sc+30));x.stroke();x.setLineDash([]);
+ boat(x,O[0],O[1]);
+ if(S.bs>.2)arrow(x,O[0],O[1],B[0],B[1],css('--bt'),2.5,[5,4]);
+ arrow(x,E[0],E[1],B[0],B[1],css('--tw'),3);
+ arrow(x,E[0],E[1],O[0],O[1],css('--aw'),4);
+ x.font='600 12px system-ui';x.textAlign='center';
+ x.fillStyle=css('--tw');x.fillText(t('ctw')+fm(S.tws),(B[0]+E[0])/2-36,(B[1]+E[1])/2-6);
+ x.fillStyle=css('--aw');x.fillText(t('caw')+fm(S.aws),(O[0]+E[0])/2+36,(O[1]+E[1])/2+12);
+ x.fillStyle=css('--mut');x.fillText(t('cm'),w/2,h-8);
+ [x,w,h]=setup($('pol'));
+ const cx=w/2,cy=h/2,R=Math.min(w,h)/2-22,mx=Math.max(S.pmax,1);
+ x.strokeStyle=css('--bd');x.fillStyle=css('--mut');x.font='11px system-ui';x.textAlign='left';
+ for(let k=1;k<=3;k++){x.beginPath();x.arc(cx,cy,R*k/3,0,7);x.stroke();x.fillText((mx*k/3).toFixed(0)+' '+t('u'),cx+3,cy-R*k/3+11)}
+ x.beginPath();x.moveTo(cx,cy-R-6);x.lineTo(cx,cy+R+6);x.stroke();
+ x.textAlign='center';x.fillText(t('cw'),cx,12);
+ x.strokeStyle=css('--tw');x.lineWidth=2;x.beginPath();
+ for(let s=-1;s<=1;s+=2){for(let d=0;d<=180;d+=3){const r=polar(d,S.tws)/mx*R,px=cx+s*r*Math.sin(rad(d)),py=cy-r*Math.cos(rad(d));d?x.lineTo(px,py):x.moveTo(px,py)}}
+ x.stroke();x.lineWidth=1;
+ [S.best.u.a,S.best.d.a].forEach(d=>{[-1,1].forEach(s=>{const r=polar(d,S.tws)/mx*R;x.fillStyle=css('--ok');x.beginPath();x.arc(cx+s*r*Math.sin(rad(d)),cy-r*Math.cos(rad(d)),4,0,7);x.fill()})});
+ const r=S.bs/mx*R,dx=cx+r*Math.sin(a),dy=cy-r*Math.cos(a);
+ x.strokeStyle=css('--ok');x.setLineDash([4,3]);x.lineWidth=2;x.beginPath();x.moveTo(dx,dy);x.lineTo(cx,dy);x.stroke();x.setLineDash([]);
+ x.strokeStyle=css('--mut');x.beginPath();x.moveTo(cx,cy);x.lineTo(dx,dy);x.stroke();
+ x.fillStyle=css('--aw');x.beginPath();x.arc(dx,dy,6,0,7);x.fill();
+}
+function update(){
+ document.querySelectorAll('[data-i]').forEach(e=>e.innerHTML=t(e.dataset.i));
+ document.querySelectorAll('.u').forEach(e=>e.textContent=t('u'));
+ const tws=+$('tws').value,twa=+$('twa').value,auto=$('auto').checked;
+ if(auto)$('bs').value=polar(twa,tws).toFixed(1);$('bs').disabled=auto;
+ const bs=+$('bs').value,a=rad(twa);
+ const aws=Math.hypot(tws*Math.sin(a),tws*Math.cos(a)+bs),awa=deg(Math.atan2(tws*Math.sin(a),tws*Math.cos(a)+bs));
+ const v=bs*Math.cos(a),up=twa<90,bb=best(tws);
+ $('vtws').textContent=fm(tws);$('vtwa').textContent=twa;$('vbs').textContent=fm(bs);
+ $('aws').textContent=fm(aws);$('awa').textContent=awa.toFixed(0);
+ $('vl').textContent=up?t('vu'):twa>90?t('vd'):t('vb');
+ $('vmg').textContent=fm(Math.abs(v),2);$('pos').textContent=pos(twa);
+ $('note').innerHTML=t('note')((twa-awa).toFixed(0),aws>tws,fm(Math.abs(aws-tws)));
+ let n=0;for(const q of th){if(tws>=q)n++;else break}
+ const ad=t('adv')[aws<8?0:aws<16?1:aws<22?2:aws<28?3:4];
+ const c=up?t('cu')((Math.abs(v)/bb.u.v*100).toFixed(0)):twa>90?t('cd')((Math.abs(v)/bb.d.v*100).toFixed(0)):'';
+ $('info').innerHTML=t('i1')(n,t('bf')[Math.min(n,10)],ad)+t('i2')(bb.u.a,fm(bb.u.v),bb.d.a,fm(bb.d.v),c)+t('i3');
+ draw({tws,twa,bs,aws,best:bb,pmax:Math.max(...A.map(d=>polar(d,tws)),1)});
+}
+['tws','twa','bs','auto'].forEach(i=>$(i).addEventListener('input',update));
+document.querySelectorAll('#lang button').forEach(b=>b.addEventListener('click',()=>{L=b.dataset.l;document.documentElement.lang=L;document.querySelectorAll('#lang button').forEach(o=>o.classList.toggle('on',o===b));update()}));
+addEventListener('resize',update);update();
+</script></body></html>
